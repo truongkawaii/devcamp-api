@@ -5,12 +5,22 @@ const errorHandler = (err, req, res, next) => {
   error.message = err.message;
 
   // Log to console for dev
-  console.log(err.stack.red);
+  console.log(err);
 
   // Mongoose bad ObjectId
   if (err.name === "CastError") {
     const message = `Bootcamp not found id of ${err.value}`;
     error = new ErrorResponse(message, 404);
+  }
+  // Mongoose Dupicate Key
+  if (err.code === 11000) {
+    const message = `Dupicate feild value entered `;
+    error = new ErrorResponse(message, 400);
+  }
+  // Mongoose Validator Error
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors).map((val) => val.message);
+    error = new ErrorResponse(message, 400);
   }
 
   res
